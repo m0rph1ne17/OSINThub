@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}{% block content %}
+<section class="hero"><div><p class="eyebrow">INVESTIGATION CONSOLE / 01</p><h1>Open-source intelligence<span>.</span></h1><p>Run scoped checks, preserve source context, and review previous investigations.</p></div><b class="pill">● SYSTEM READY</b></section>
+<section class="panel"><p class="eyebrow">NEW INVESTIGATION</p><h2>Start a scan</h2><form action="/scan" method="post">
+<label for="target_type">Investigation type</label><select id="target_type" name="target_type"><option value="username">Username / public profile</option><option value="email">Email address</option><option value="phone">Phone number</option><option value="domain">Web domain</option></select>
+<label for="target">Target identifier</label><input id="target" name="target" maxlength="254" placeholder="Username, email, phone, or domain" required>
+<small>Only investigate information you are authorized to research. A match is not proof of identity.</small><button>Start investigation ↗</button></form></section>
+<section class="panel"><div class="heading"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Previous scans</h2></div><a href="/history">View all →</a></div>
+{% if scans %}<div class="tablewrap"><table><tr><th>ID</th><th>TYPE</th><th>TARGET</th><th>DATE</th><th>STATUS</th></tr>{% for s in scans %}<tr><td>#{{s.id}}</td><td>{{s.target_type}}</td><td><a href="/scan/{{s.id}}">{{s.target}}</a></td><td>{{s.created_at}}</td><td>{{s.status}}</td></tr>{% endfor %}</table></div>{% else %}<p class="empty">No investigations yet. Your saved scans will appear here.</p>{% endif %}</section>
+<div class="notice"><b>Operational boundary</b><p>This MVP uses public-source checks and local parsing. It does not access private accounts, bypass authentication, or identify private subscribers.</p></div>{% endblock %}

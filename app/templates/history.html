@@ -1,0 +1,3 @@
+{% extends "base.html" %}{% block title %}History{% endblock %}{% block content %}
+<section class="hero"><div><p class="eyebrow">ARCHIVE / 02</p><h1>Scan history</h1><p>Locally stored investigations, newest first.</p></div></section><section class="panel">
+{% if scans %}<div class="tablewrap"><table><tr><th>ID</th><th>TYPE</th><th>TARGET</th><th>DATE</th><th>STATUS</th></tr>{% for s in scans %}<tr><td>#{{s.id}}</td><td>{{s.target_type}}</td><td><a href="/scan/{{s.id}}">{{s.target}}</a></td><td>{{s.created_at}}</td><td>{{s.status}}</td></tr>{% endfor %}</table></div>{% else %}<p class="empty">No saved scans.</p>{% endif %}</section>{% endblock %}
