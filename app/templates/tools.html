@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Tool integrations{% endblock %}
+{% block content %}
+<section class="hero"><div><p class="eyebrow">INTEGRATION MANAGER / 02</p><h1>External tools<span>.</span></h1><p>Optional command-line integrations. Each tool is disabled until you enable it.</p></div><b class="pill">LOCAL EXECUTION</b></section>
+<div class="notice"><b>Authorization requirement</b><p>Use these integrations only for public-source research you are authorized to conduct. Username tools make requests to third-party sites. Domain tools query public sources; WhatWeb sends an HTTP request to the target website. Respect provider terms, rate limits, and applicable law.</p></div>
+{% for tool in tools %}
+<section class="panel tool-card">
+  <div class="heading"><div><p class="eyebrow">{{ tool.target_type|upper }} TOOL</p><h2>{{ tool.name }}</h2></div>
+    {% if tool.installed %}<b class="pill">● INSTALLED</b>{% else %}<b class="pill missing">○ NOT FOUND</b>{% endif %}
+  </div>
+  <p>{{ tool.description }}</p>
+  <p class="tool-meta">Executable: <code>{{ tool.executable or tool.install }}</code></p>
+  <p><a href="{{ tool.upstream }}" target="_blank" rel="noopener noreferrer">Official project documentation ↗</a></p>
+  <div class="actions">
+    <form action="{{ url_for('main.toggle_tool', tool_id=tool.id) }}" method="post"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="enabled" value="{{ 0 if tool.enabled else 1 }}">
+      <button class="{{ 'secondary' if tool.enabled else '' }}" {% if not tool.installed and not tool.enabled %}disabled{% endif %}>{{ 'Disable integration' if tool.enabled else 'Enable integration' }}</button>
+    </form>
+    {% if tool.enabled and tool.installed %}
+    <form class="tool-run" action="{{ url_for('main.run_integration') }}" method="post"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="tool_id" value="{{ tool.id }}">
+      <label for="target-{{ tool.id }}">{{ 'Username' if tool.target_type == 'username' else 'Public domain' }}</label>
+      <input id="target-{{ tool.id }}" name="target" maxlength="254" placeholder="{{ 'username' if tool.target_type == 'username' else 'example.org' }}" required>
+      <button>Run {{ tool.name }} ↗</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

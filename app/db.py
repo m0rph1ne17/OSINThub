@@ -18,13 +18,17 @@ def init_db():
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       results_json TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS tool_settings (
+      tool_id TEXT PRIMARY KEY,
+      enabled INTEGER NOT NULL DEFAULT 0
+    );
     ''')
     get_db().commit()
 
-def save_scan(kind, target, results):
+def save_scan(kind, target, results, status="completed"):
     cur = get_db().execute(
         "INSERT INTO scans(target_type,target,status,results_json) VALUES(?,?,?,?)",
-        (kind, target, "completed", json.dumps(results, ensure_ascii=False)))
+        (kind, target, status, json.dumps(results, ensure_ascii=False)))
     get_db().commit()
     return cur.lastrowid
 
@@ -40,3 +44,14 @@ def get_scan(scan_id):
     item = dict(row)
     item["results"] = json.loads(item.pop("results_json"))
     return item
+
+def get_tool_settings():
+    rows = get_db().execute("SELECT tool_id,enabled FROM tool_settings").fetchall()
+    return {row["tool_id"]: bool(row["enabled"]) for row in rows}
+
+def set_tool_enabled(tool_id, enabled):
+    get_db().execute(
+        "INSERT INTO tool_settings(tool_id,enabled) VALUES(?,?) "
+        "ON CONFLICT(tool_id) DO UPDATE SET enabled=excluded.enabled",
+        (tool_id, 1 if enabled else 0))
+    get_db().commit()

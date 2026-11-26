@@ -9,6 +9,10 @@ def markdown_report(scan):
     for finding in scan["results"].get("findings", []):
         lines += ["### " + finding.get("label", "Finding"), "", "```json",
                   json.dumps(finding.get("value"), indent=2, ensure_ascii=False), "```", ""]
+    execution = scan["results"].get("execution")
+    if execution:
+        lines += ["## Tool execution", "", "```json",
+                  json.dumps(execution, indent=2, ensure_ascii=False), "```", ""]
     lines += ["## Limitations", ""] + ["- " + x for x in scan["results"].get("limitations", [])]
     lines += ["", "Generated locally by OSINThub. Verify findings independently."]
     return "\n".join(lines)
